@@ -24,12 +24,12 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
-use IEEE.NUMERIC_STD.ALL;
+--use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
-library UNISIM;
-use UNISIM.VComponents.all;
+--library UNISIM;
+--use UNISIM.VComponents.all;
 
 entity ALU is
     Port ( i_A : in STD_LOGIC_VECTOR (7 downto 0);
@@ -56,6 +56,7 @@ architecture Behavioral of ALU is
     
 begin
 
+    --Adder--
     ripple_adder_0: ripple_adder
     port map(
         A   => i_A(3 downto 0),
@@ -74,11 +75,13 @@ begin
         Cout => w_carry(1)
     );
     
+    --Input Logic--
     with i_op(0) select
     w_B_logic <= i_B      when '0',
                  NOT i_B  when '1',
                  i_B      when others;
                  
+    --ALU Control--
     with i_op select
     w_Result <= w_S_ripple_out when "000",
                 w_S_ripple_out when "001",
@@ -86,16 +89,18 @@ begin
                 i_A OR i_B     when "011",
                 x"00"          when others;
                 
-    --V/Overflow
+    --Flag Logic--
+    --V / Overflow--
     o_flags(0) <= (NOT(i_op(0) XOR i_A(7) XOR i_B(7))) AND (i_A(7) XOR w_S_ripple_out(7)) AND (NOT i_op(1));
-    --C/Carry
+    --C / Carry--
     o_flags(1) <= (NOT i_op(1)) AND w_carry(1);
-    --Z/Zero
+    --Z / zero--
     o_flags(2) <= not (w_Result(7) or w_Result(6) or w_Result(5) or w_Result(4) or
                    w_Result(3) or w_Result(2) or w_Result(1) or w_Result(0));
-    --N/Negative
+    --N / Negative--
     o_flags(3) <= w_Result(7);
     
+    --Output Logic--
     o_result <= w_Result;
 
 end Behavioral;
